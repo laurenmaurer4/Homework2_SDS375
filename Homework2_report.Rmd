@@ -1,6 +1,5 @@
 ---
 title: "Homework 2 Report"
-author: "Lauren Maurer"
 output: html_document
 ---
 
@@ -71,7 +70,7 @@ ggplot(dataset, aes(x = age, y = fev1)) +
 
 Write your data analysis statement interpreting the regression model here:
 
-The expected difference in fev1 between children whose ages happens to differ by one is 0.17 liters. 
+The expected difference in FEV1 between children whose ages happens to differ by one year is 0.17 liters. 
 
 
 ## Part 3
@@ -89,7 +88,8 @@ NOTE:
 
 ## Statement 1
 ggplot(dataset, aes(x=age, y=fev1)) +
-  geom_point()
+  geom_point() +
+  labs(title = 'Age vs FEV1', x = 'Age', y = 'FEV1')
 
 ## Statement 2
 dataset_group <- dataset %>%
@@ -107,17 +107,18 @@ tibble(mean_table)
 
 ## Statement 3
 ggplot(dataset_group, aes(x=age_group, y= fev1)) + 
-         geom_boxplot()
+  geom_boxplot() +
+  labs(title = 'Boxplot of Grouped Ages')
 ```
 
 
 Write the three supporting premise statements here:
 
-1. The scatter plot of fev1 versus age shows a clear positive slope, indicating that fev1 tends to increase as age increases.
+1. The scatter plot of FEV1 versus age shows a clear positive slope, indicating that FEV1 tends to increase as age increases.
 
-2. When ages are grouped into categories, the mean fev1 values increase with each older age group.
+2. When ages are grouped into categories, the mean FEV1 values increase with each older age group.
 
-3. Box plots of fev1 stratified by age groups reveal that the median fev1 values rise as children get older.
+3. Box plots of FEV1 stratified by age groups reveal that the median FEV1 values rise as children get older.
 
 
 ## Part 4
@@ -137,18 +138,17 @@ For statements involving plots, instead of returning `TRUE` or `FALSE`, you func
 # Plot used in statement
 ggplot(dataset, aes(x=age, y=fev1)) +
   geom_point() +
-  labs(title = "Actual Plot")
+  labs(title = "Actual Plot", x = "Age (years)", y = "FEV1")
 
 # Hypothetical plot
-x <- runif(200, min = 5, max = 18)  # Uniform distribution between 5 and 18
-y <- x/4 + rnorm(200, mean = 0, sd = .5)
+x <- runif(150, min = 5, max = 18)  # Uniform distribution between 5 and 18
+y <- x *.2 + rnorm(150, mean = 0, sd = .5)
 y_ <- pmin(pmax(y, 0.5), 5)  # clamp y between 0.5 and 5
 sim_data <- data.frame(age = x, fev1 = y)
 
 ggplot(sim_data, aes(x = age, y = fev1)) +
   geom_point() +
-  labs(title = "Simulated Data", x = "Age", y = "FEV1")+
-  labs(title = "Simulated Plot")
+  labs(title = "Simulated Plot", x = "Age (years)", y = "FEV1")
 ```
 
 
@@ -173,7 +173,7 @@ statement2_function(mean_table)
 # Real plot
 ggplot(dataset_group, aes(x=age_group, y= fev1)) + 
   geom_boxplot() +
-  labs(title = "Actual Plot")
+  labs(title = "Actual Plot", x = "Grouped Age", y = "FEV1")
 
 # Simulated plot
 sim_group <- sim_data %>%
@@ -189,7 +189,7 @@ sim_mean_table <- sim_group %>%
 
 ggplot(sim_group, aes(x=age_group, y=fev1)) +
   geom_boxplot() +
-  labs(title = "Simulated Plot")
+  labs(title = "Simulated Plot", x = "Grouped Age", y = "FEV1")
 ```
 
 Execute each of your function and show that the produce the expected output.
