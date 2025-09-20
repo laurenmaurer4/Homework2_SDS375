@@ -1,12 +1,13 @@
 ---
 title: "Homework 2 Report"
+author: "Lauren Maurer"
 output: html_document
 ---
 
 
 ## Name
 
-Please enter your name here.
+Lauren Maurer
 
 ### Setup
 
@@ -15,7 +16,10 @@ Read in the data with `read_csv()` and store the data as an R object named `data
 
 ```{r}
 ## Load the data and any necessary packages here.
-
+dataset <- read.csv("maacs.csv.gz")
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
 ```
 
 ## Part 1
@@ -33,6 +37,18 @@ NOTE: For this part, do not use any plots.
 ```{r}
 ## Write your function here
 
+check_relationship <- function(data){
+    dat <- dataset|>
+      filter(!is.na(fev1))
+    cor1 <- cor(dat$fev1, dat$age)
+    if (cor1 > 0){
+      return (TRUE)}
+    else{
+      return(FALSE)
+    }
+}
+
+check_relationship(dataset)
 ```
 
 
@@ -44,12 +60,18 @@ How much does FEV1 change for a 1-year increase in the child's age?
 
 ```{r}
 ## Add your code here
+lm_model <- lm(fev1 ~ age, data = dataset)
+
+ggplot(dataset, aes(x = age, y = fev1)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE, color = "red")
 
 ```
 
 
 Write your data analysis statement interpreting the regression model here:
 
+The expected difference in fev1 between children whose ages happens to differ by one is 0.17 liters. 
 
 
 ## Part 3
@@ -65,16 +87,37 @@ NOTE:
 ```{r}
 ## Add your code here
 
+## Statement 1
+ggplot(dataset, aes(x=age, y=fev1)) +
+  geom_point()
+
+## Statement 2
+dataset_group <- dataset %>%
+  mutate(age_group = cut(age,
+                         breaks = c(5, 8, 11, 15, 18),
+                         labels = c("5-7", "8-10", "11-14", "15-17"),
+                         right = FALSE))
+mean_table <- dataset_group %>%
+  group_by(age_group) %>%
+  summarise(
+    mean_fev1 = round(mean(fev1, na.rm = TRUE), 3)
+  )
+
+tibble(mean_table)
+
+## Statement 3
+ggplot(dataset_group, aes(x=age_group, y= fev1)) + 
+         geom_boxplot()
 ```
 
 
 Write the three supporting premise statements here:
 
-1. 
+1. The scatter plot of fev1 versus age shows a clear positive slope, indicating that fev1 tends to increase as age increases.
 
-2. 
+2. When ages are grouped into categories, the mean fev1 values increase with each older age group.
 
-3. 
+3. Box plots of fev1 stratified by age groups reveal that the median fev1 values rise as children get older.
 
 
 ## Part 4
@@ -91,18 +134,62 @@ For statements involving plots, instead of returning `TRUE` or `FALSE`, you func
 ```{r}
 ## Function for supporting premise statement 1
 
+# Plot used in statement
+ggplot(dataset, aes(x=age, y=fev1)) +
+  geom_point() +
+  labs(title = "Actual Plot")
+
+# Hypothetical plot
+x <- runif(200, min = 5, max = 18)  # Uniform distribution between 5 and 18
+y <- x/4 + rnorm(200, mean = 0, sd = .5)
+y_ <- pmin(pmax(y, 0.5), 5)  # clamp y between 0.5 and 5
+sim_data <- data.frame(age = x, fev1 = y)
+
+ggplot(sim_data, aes(x = age, y = fev1)) +
+  geom_point() +
+  labs(title = "Simulated Data", x = "Age", y = "FEV1")+
+  labs(title = "Simulated Plot")
 ```
 
 
 ```{r}
 ## Function for supporting premise statement 2
+statement2_function <- function(mean_table){
+    mean_vec <- mean_table$mean_fev1
+  
+  # Check if the vector is strictly increasing
+  is_increasing <- all(diff(mean_vec) > 0)
+  
+  return(is_increasing)
+}
 
+statement2_function(mean_table)
 ```
 
 
 ```{r}
 ## Function for supporting premise statement 3
 
+# Real plot
+ggplot(dataset_group, aes(x=age_group, y= fev1)) + 
+  geom_boxplot() +
+  labs(title = "Actual Plot")
+
+# Simulated plot
+sim_group <- sim_data %>%
+  mutate(age_group = cut(age,
+                         breaks = c(5, 8, 11, 15, 18),
+                         labels = c("5-7", "8-10", "11-14", "15-17"),
+                         right = FALSE))
+sim_mean_table <- sim_group %>%
+  group_by(age_group) %>%
+  summarise(
+    sim_mean_fev1 = round(mean(fev1, na.rm = TRUE), 3)
+  )
+
+ggplot(sim_group, aes(x=age_group, y=fev1)) +
+  geom_boxplot() +
+  labs(title = "Simulated Plot")
 ```
 
 Execute each of your function and show that the produce the expected output.
